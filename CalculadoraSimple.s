@@ -1,15 +1,39 @@
 /*=======================================================
-* Programa:     Operaciones.s
+* Programa:     CalculadoraSimple.s
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
-* Fecha:        04 de Octubre de 2024
+* Fecha:        06 de Noviembre de 2024
 * Descripción: Programa que suma, resta, multiplica
 *              y divide dos numeros ingresados por
 *              el usuario.
 *              
-* Compilación:  as -o Operaciones.o Operaciones.s
-*               gcc -o Operaciones Operaciones.o
-* Ejecución:    ./Operaciones
+* Compilación:  as -o CalculadoraSimple.o CalculadoraSimple.s
+*               gcc -o CalculadoraSimple CalculadoraSimple.o
+* Ejecución:    ./CalculadoraSimple
+*
+* Código equivalente en C#:
+* -----------------------------------------------------
+*            Console.WriteLine("Ingrese el primer valor");
+*            float x = float.Parse(Console.ReadLine());
+*
+*            Console.WriteLine("Ingrese el segundo valor");
+*            float y = float.Parse(Console.ReadLine());
+*
+*            float suma = x + y;
+*            float resta = x - y;
+*            float multiplicacion = x * y;
+*            float division = x / y;
+*
+*            Console.WriteLine("La suma es: {0}", suma);
+*            Console.WriteLine("La suma es: {0}", resta);
+*            Console.WriteLine("La suma es: {0}", multiplicacion);
+*            Console.WriteLine("La suma es: {0}", division);
+*
+*
+* ASCIINEMA
+* -----------------------------------------------------
+* https://asciinema.org/a/rl8PWvrt1DVOqizd3KZ5E0xSc
+* -----------------------------------------------------
 
 =========================================================*/
 
