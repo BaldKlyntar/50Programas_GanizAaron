@@ -13,12 +13,18 @@
 *
 * Código equivalente en C#:
 * -----------------------------------------------------
-*            
-*            
+*           static void Main(string[] args)
+*        {
 *
-*            
-*            
-*            
+*            Console.WriteLine("Ingrese un valor en Celsius: ");
+*            float celsius = float.Parse(Console.ReadLine());
+*
+*            float farenheit = ((celsius * 9) / 5) + 32;
+*
+*            Console.WriteLine("Grados Farenheit = {0}", farenheit);
+*
+*        }
+*    }         
 *            
 *
 *
