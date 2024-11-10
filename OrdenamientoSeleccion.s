@@ -33,7 +33,7 @@
     newline:      .asciz "\n"           // Nueva línea
 
 .section .text
-    .global _start
+    .global main
 
 main:
     // Mostrar el mensaje de inicio
