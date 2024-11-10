@@ -13,7 +13,24 @@
 *
 * Código equivalente en C#:
 * -----------------------------------------------------
-*            
+*   public static void Palindromo(string str)
+    {
+        int izq = 0;
+        int der = str.Length - 1;
+
+        while (izq < der)
+        {
+            if (str[izq] != str[der])
+            {
+                Console.WriteLine("La cadena no es un palíndromo.");
+                return;
+            }
+            izq++;
+            der--;
+        }
+
+        Console.WriteLine("La cadena es un palíndromo."); 
+    }       
 *            
 *
 *           
