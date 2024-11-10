@@ -45,3 +45,33 @@
 * -----------------------------------------------------
 
 =========================================================*/
+
+
+.section .data
+
+    izq: .word 0
+    der: .word 0
+    msg_true: .asciz "La palabra es un palindromo\n"
+    msg_false: .asciz "La palabra no es un palindromo\n"
+    format: .asciz "%s"
+    palabra: .asciz ""
+    msg_ingreso: .asciz "Ingrese una palabra: "
+
+.section .text
+
+    .global main
+    .extern printf
+    .extern scanf
+
+main:
+
+    ldr x0, =msg_ingreso
+    bl printf
+
+    adr x0, format
+    adr x1, palabra
+    bl scanf
+
+
+
+    
