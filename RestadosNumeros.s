@@ -36,10 +36,7 @@
 
     num1:    .quad 0  // num1 almacenara el primero valor ingresado por el usuario
     num2:    .quad 0 // num2 almacenara el segundo valor ingresado por el usuario
-    msg_sum: .asciz "La suma es: %lld\n" // Imprimira la cadena de caracteres para el resultado de la suma
     msg_sub: .asciz "La resta es: %lld\n" // Imprimira la cadena de caracteres para el resultado de la resta
-    msg_mul: .asciz "La multiplicacion es: %lld\n" // Imprimira la cadena de caracteres para el resultado de la multiplicacion
-    msg_div: .asciz "La division es: %lld\n" // Imprimira la cadena de caracteres para el resultado de la division
     format:  .asciz "%lld" // Indica el tipo de formato que recibira la funcion scanf de la libreria c
     msgin: .asciz "Ingresa un valor: " // Cadena para indicar al usuario cuando debe ingresar un valor
     
