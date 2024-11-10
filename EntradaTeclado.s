@@ -48,3 +48,10 @@ main:
 
   ldr x0, =msg_output
   bl scanf
+
+      // Salir del programa
+
+    mov     x0, #0 // Código de estado 0 (indica éxito)
+    mov     x8, #93 // Número de syscall para 'exit' (93 en ARM64)
+    svc     0 // Se realiza la llamda al sistema
+
