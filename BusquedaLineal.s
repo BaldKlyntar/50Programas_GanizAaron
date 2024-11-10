@@ -83,4 +83,92 @@
         .extern printf
         .extern scanf
 
+
+ main:
+
+        ldr x0, =imprimir_numeros    // Cargar la dirección del mensaje
+        ldr x28, =numeros             // Cargar la dirección de los números
+        ldr x1, [x28]
+        ldr x2, [x28, #4]
+        ldr x3, [x28, #8]
+        ldr x4, [x28, #12]
+        ldr x5, [x28, #16]
+        bl printf
+
+        ldr x0, =msg_buscar
+        bl printf
+        adr x0, format
+        adr x1, num_busca
+        bl scanf
+	        b while_loop
+
+while_loop:
+
+        ldr x0, =pos
+        ldr x1, [x0]
+
+        ldr x0, =T
+        ldr x2, [x0]
+
+        cmp x1, x2
+        blt if_flag
+        b end_loop
+
+if_flag:
+
+        ldr x28, =numeros
+        ldr x0, =pos
+        ldr x1, [x0]
+        ldr x0, =busca
+        ldr x2, [x0]
+
+        mul x5, x1, #4
+        ldr x6, [x28, x5]
+	cmp x6, x2
+        beq flag_find
+        b flag_plus
+
+flag_find:
+
+        mov x5, #1
+        ldr x0, =flag
+        str x5, [x0]
+
+        ldr x0, =msg_encontrado
+        bl printf
+        b flag_plus
+
+
+flag_plus:
+
+        ldr x0, =pos
+        ldr x1, [x0]
+        add x2, x1, #1
+        str x2, [x0]
+
+        b while_loop
+
+ end_loop:
+
+        ldr x0, =flag
+        ldr x1, [x0]
+        cmp x1, #0
+        beq flag_lost
+        b end_code
+
+flag_lost:
+
+        ldr x0, =msg_noencontrado
+        bl printf
+
+end_code:
+
+
+        b end_code
+
+
+ 
+
+ 	
+
 	
