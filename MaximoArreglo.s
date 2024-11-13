@@ -24,28 +24,20 @@
 =========================================================*/
 
 .section .data
-    prompt:       .asciz "El máximo en el arreglo:\n"
-    maxMsg:       .asciz "\nEl máximo valor en el arreglo es:\n"
-    array:        .word 5, 3, 8, 1, 2    // Array de ejemplo
-    length:       .word 5                // Longitud del array
-    newline:      .asciz "\n"            // Nueva línea
+    msg_out:       .asciz "\nEl máximo valor en el arreglo es:\n"
+    numeros:        .word 9, 7, 6, 2, 1    // Array de ejemplo
+    T:       .word 5                // Longitud del array
 
-.text
-    .global main
+.section .text
+    .global _start
 
-main:
-    // Mostrar el mensaje de inicio
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =prompt                 // Dirección del mensaje de inicio
-    mov x2, #31                     // Longitud del mensaje
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
+_start:
 
     // Mostrar el contenido del arreglo
     mov w10, #0                     // Índice para impresión
 
 print_array:
-    ldr x3, =array                  // Dirección base del array
+    ldr x3, =numeros                  // Dirección base del array
     lsl w11, w10, #2                // Desplazamiento de w10 (w11 = w10 * 4 bytes por palabra)
     add x3, x3, x11                 // Dirección de array[w10]
     ldr w0, [x3]                    // Cargar el valor en w0
@@ -53,33 +45,19 @@ print_array:
     // Convertir el número a texto (para impresión) llamando a la función print_num
     bl print_num
 
-    // Imprimir un espacio después de cada número
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =newline                // Dirección de la nueva línea (usada como espacio aquí)
-    mov x2, #1                      // Longitud del espacio
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
-
     add w10, w10, #1                // Incrementar índice
-    ldr x1, =length                 // Dirección de la longitud
+    ldr x1, =T                 // Dirección de la longitud
     ldr w1, [x1]                    // Leer la longitud original del array
     cmp w10, w1                     // Comparar índice con la longitud del array
     blt print_array                 // Repetir si aún hay elementos
 
-    // Añadir una nueva línea después del arreglo
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =newline                // Dirección de la nueva línea
-    mov x2, #1                      // Longitud de la nueva línea
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
-
     // Cargar la longitud del array en w1
-    ldr x1, =length
+    ldr x1, =T
     ldr w1, [x1]
 
     // Configurar el índice y el valor inicial máximo
     mov w2, #0                      // Índice del array
-    ldr x3, =array                  // Dirección base del array
+    ldr x3, =numeros                  // Dirección base del array
     ldr w4, [x3]                    // Cargar el primer valor del array en w4 (inicialmente el máximo)
 
 find_max:
@@ -101,7 +79,7 @@ skip_update:
 
     // Mostrar el mensaje del valor máximo encontrado
     mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =maxMsg                 // Dirección del mensaje "El máximo valor en el arreglo es:\n"
+    ldr x1, =msg_out                 // Dirección del mensaje "El máximo valor en el arreglo es:\n"
     mov x2, #34                     // Longitud del mensaje
     mov x8, #64                     // Syscall para 'write' (64)
     svc #0                          // Ejecutar syscall
@@ -109,13 +87,6 @@ skip_update:
     // Imprimir el valor máximo
     mov w0, w4                      // Cargar el máximo valor en w0 para impresión
     bl print_num                    // Llamada a la función para imprimir el número
-
-    // Imprimir una nueva línea
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =newline                // Dirección de la nueva línea
-    mov x2, #1                      // Longitud de la nueva línea
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
 
     // Terminar el programa
     mov x8, #93                     // Syscall para 'exit' (93)
