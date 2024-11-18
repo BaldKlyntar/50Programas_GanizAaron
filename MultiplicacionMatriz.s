@@ -56,82 +56,134 @@
 * -----------------------------------------------------
 
 =========================================================*/
+.section .data
+    msg_matriz1_1: .asciz "Matriz 1: [%d %d %d]\n"
+    msg_matriz1_2: .asciz "[%d %d %d]\n"
+    msg_matriz2_1: .asciz "Matriz 2: [%d %d]\n"
+    msg_matriz2_2: .asciz "[%d %d]\n"
+    msg_matriz2_3: .asciz "[%d %d]\n"
+    msg_resultado: .asciz "Resultado:\n"
 
-.sectio .data
-    .global matrizA, matrizB, resultado
+    matriz1:
+        .word 1, 2, 3
+        .word 4, 5, 6
 
-matrizA:
-    .word 1, 2, 3
-    .word 4, 5, 6
-    .word 7, 8, 9
+    matriz2:
+        .word 7, 8
+        .word 9, 10
+        .word 11, 12
+	
+resultado:
+	.word 0, 0
+	.word 0, 0
 
-matrizB:
-    .word 9, 8, 7
-    .word 6, 5, 4
-    .word 3, 2, 1
-
-resultado: .space 36    
-
-.section .text
+.section .text 
     .global main
+    .extern printf
 
 main:
-    // Cargar las direcciones de las matrices en registros
-    ldr x0, =matrizA           // Dirección de matrizA
-    ldr x1, =matrizB           // Dirección de matrizB
-    ldr x2, =resultado         // Dirección de resultado
 
-    mov w3, #0                 // Índice i (contador de filas de A)
-    mov x12, #3                // Guardar el valor 3 en x12 para usarlo en multiplicaciones
+    // Imprimir "Matriz 1"
+    ldr x0, =msg_matriz1_1        // Cargar el mensaje de la primera fila de la matriz1
+    ldr x28, =matriz1              // Cargar la dirección base de matriz1
+    ldr x1, [x28]                 // Cargar el primer valor de matriz1 en w1
+    ldr x2, [x28, #4]             // Cargar el segundo valor de matriz1 en w2
+    ldr x3, [x28, #8]             // Cargar el tercer valor de matriz1 en w3
+    bl printf                     // Llamada a printf
 
-fila_loop:
-    mov w4, #0                 // Índice j (contador de columnas de B)
+    ldr x0, =msg_matriz1_2        // Cargar el mensaje de la segunda fila de la matriz1
+    ldr x1, [x28, #12]            // Cargar el cuarto valor de matriz1 en w1
+    ldr x2, [x28, #16]            // Cargar el quinto valor de matriz1 en w2
+    ldr x3, [x28, #20]            // Cargar el sexto valor de matriz1 en w3
+    bl printf                     // Llamada a printf
 
-columna_loop:
-    mov w8, #0                 // Acumulador para resultado[i][j]
-    mov w5, #0                 // Índice k para multiplicación A[i][k] * B[k][j]
+    // Imprimir "Matriz 2"
+    ldr x0, =msg_matriz2_1        // Cargar el mensaje de la primera fila de la matriz2
+    ldr x28, =matriz2              // Cargar la dirección base de matriz2
+    ldr x1, [x28]                 // Cargar el primer valor de matriz2 en w1
+    ldr x2, [x28, #4]             // Cargar el segundo valor de matriz2 en w2
+    bl printf                     // Llamada a printf
 
-multiplicacion_loop:
-    // Calcular posición en A para A[i][k] = matrizA[i][k]
-    mov x6, x3                 // x6 = i
-    mul x6, x6, x12            // x6 = i * 3
-    add x6, x6, x5             // x6 = i * 3 + k
+    ldr x0, =msg_matriz2_2        // Cargar el mensaje de la segunda fila de la matriz2
+    ldr x1, [x28, #8]             // Cargar el tercer valor de matriz2 en w1
+    ldr x2, [x28, #12]            // Cargar el cuarto valor de matriz2 en w2
+    bl printf                     // Llamada a printf
 
-    // Calcular posición en B para B[k][j] = matrizB[k][j]
-    mov x7, x5                 // x7 = k
-    mul x7, x7, x12            // x7 = k * 3
-    add x7, x7, x4             // x7 = k * 3 + j
+    ldr x0, =msg_matriz2_3        // Cargar el mensaje de la tercera fila de la matriz2
+    ldr x1, [x28, #16]            // Cargar el quinto valor de matriz2 en w1
+    ldr x2, [x28, #20]            // Cargar el sexto valor de matriz2 en w2
+    bl printf                     // Llamada a printf
 
-    // Cargar y multiplicar los elementos A[i][k] y B[k][j]
-    ldr w9, [x0, x6, LSL #2]   // w9 = matrizA[i][k]
-    ldr w10, [x1, x7, LSL #2]  // w10 = matrizB[k][j]
-    mul w11, w9, w10           // w11 = matrizA[i][k] * matrizB[k][j]
+        // Inicializamos el resultado
+    mov x28, #0               // i = 0
+    mov x29, #0               // j = 0
 
-    // Acumular en w8 el producto parcial
-    add w8, w8, w11            // w8 += matrizA[i][k] * matrizB[k][j]
+    // Cargar la dirección de la matriz1
+    ldr x0, =matriz1          // x0 = dirección de matriz1
+    ldr x1, =matriz2          // x1 = dirección de matriz2
+    ldr x2, =resultado        // x2 = dirección de resultado
 
-    add w5, w5, #1             // k++
-    cmp w5, #3                 // Comparar k con el tamaño de la fila/columna
-    blt multiplicacion_loop    // Si k < 3, repetir multiplicacion_loop
+    // Bucle i (por filas de matriz1)
+loop_i:
+    cmp x28, #2               // Comparar i con 2 (número de filas en resultado)
+    bge end_program           // Si i >= 2, salir del programa
 
-    // Guardar el resultado en la posición correspondiente
-    mov x10, x3                // x10 = i
-    mul x10, x10, x12          // x10 = i * 3
-    add x10, x10, x4           // x10 = i * 3 + j
-    str w8, [x2, x10, LSL #2]  // resultado[i][j] = acumulador w8
+    mov x29, #0               // j = 0
 
-    add w4, w4, #1             // j++
-    cmp w4, #3                 // Comparar j con el tamaño de la fila
-    blt columna_loop           // Si j < 3, repetir columna_loop
+    // Bucle j (por columnas de matriz2)
+loop_j:
+    cmp x29, #2               // Comparar j con 2 (número de columnas en resultado)
+    bge next_i                // Si j >= 2, pasar al siguiente i
 
-    add w3, w3, #1             // i++
-    cmp w3, #3                 // Comparar i con el tamaño de la columna
-    blt fila_loop              // Si i < 3, repetir fila_loop
+    mov x30, #0               // k = 0
+    mov x3, #0                // resultado[i, j] = 0
+
+    // Bucle k (por elementos de la fila de matriz1 y columna de matriz2)
+loop_k:
+    cmp x30, #3               // Comparar k con 3 (número de elementos en fila de matriz1 y columna de matriz2)
+    bge store_result          // Si k >= 3, almacenar el resultado en resultado[i, j]
+
+    // Cargar elementos de matriz1 y matriz2
+    ldr w4, [x0, x28, LSL #2] // w4 = matriz1[i, k]
+    ldr w5, [x1, x30, LSL #2] // w5 = matriz2[k, j]
+
+    // Multiplicar y acumular en resultado[i, j]
+    mul w6, w4, w5            // w6 = matriz1[i, k] * matriz2[k, j]
+    add x3, x3, x6            // resultado[i, j] += w6
+
+    // Incrementar k
+    add x30, x30, #1          // k++
+
+    b loop_k                  // Volver al bucle k
+
+store_result:
+    str w3, [x2, x28, LSL #2] // Almacenar resultado[i, j] en resultado[i, j]
+
+    // Incrementar j
+    add x29, x29, #1          // j++
+
+    b loop_j                  // Volver al bucle j
+
+next_i:
+    add x28, x28, #1          // i++
+    b loop_i                  // Volver al bucle i
+
+end_program:
+
+    // Imprimir resultado
+    ldr x0, =msg_resultado    // Cargar el mensaje "Resultado"
+    bl printf                 // Llamar a printf
+
+    ldr x15, =resultado        // Cargar la dirección de resultado
+    ldr x1, [x15]              // Cargar resultado[0, 0]
+    ldr x2, [x15, #4]          // Cargar resultado[0, 1]
+    ldr x3, [x15, #8]          // Cargar resultado[1, 0]
+    ldr x4, [x15, #12]         // Cargar resultado[1, 1]
+    bl printf                 // Llamar a printf para imprimir resultado
 
     // Salir del programa
-
-    mov     x0, #0 // Código de estado 0 (indica éxito)
-    mov     x8, #93 // Número de syscall para 'exit' (93 en ARM64)
-    svc     0 // Se realiza la llamda al sistema
+    mov x0, #0                // Código de estado 0
+    mov x8, #93               // Número de syscall para 'exit' (93 en ARM64)
+    svc 0                      // Llamada al sistema para salir
 
 	
