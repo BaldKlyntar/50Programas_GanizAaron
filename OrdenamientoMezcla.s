@@ -22,7 +22,6 @@
 
 =========================================================*/
 
-	
 .section .data
     prompt:       .asciz "Ordenando el array usando el método de mezcla (Merge Sort)...\n"
     sortedMsg:    .asciz "Array ordenado:\n"
@@ -32,9 +31,9 @@
     newline:      .asciz "\n"           // Nueva línea
 
 .section .text
-    .global main
+    .global _start
 
-main:
+_start:
     // Mostrar el mensaje de inicio
     mov x0, #1                      // Descriptor de archivo para STDOUT
     ldr x1, =prompt                 // Dirección del mensaje de inicio
