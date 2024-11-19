@@ -13,152 +13,133 @@
 *
 * Código equivalente en C#:
 * -----------------------------------------------------
+* static void Main()
+*   {
+*        int[] array = { 4, 9, 8, 3, 5 };
+*        int length = array.Length;
 *
+*        for (int i = 0; i < length; i++)
+*        {
+*            int minIndex = i;
+*
+*            for (int j = i + 1; j < length; j++)
+*            {
+*                if (array[j] < array[minIndex])
+*                {
+*                    minIndex = j;
+*                }
+*            }
+*
+*            if (minIndex != i)
+*            {
+*                int temp = array[i];
+*                array[i] = array[minIndex];
+*                array[minIndex] = temp;
+*            }
+*        }
+*
+*        for (int i = 0; i < length; i++)
+*        {
+*            Console.WriteLine(array[i]);
+*        }
+*    }
 *
 * ASCIINEMA
 * -----------------------------------------------------
-*
+*https://asciinema.org/a/5QVQiNO61wzvRfbY7835vk3X5
 * -----------------------------------------------------
 
 =========================================================*/
 
-// Programa en ARM64 Assembly para ordenar un array de enteros con el método de selección
-// Este programa imprimirá el array ordenado después de realizar el ordenamiento
-
 .section .data
-    prompt:       .asciz "Ordenando el array usando el método de selección...\n"
-    sortedMsg:    .asciz "Array ordenado:\n"
-    array:        .word 5, 3, 8, 1, 2   // Array a ordenar
-    length:       .word 5               // Longitud del array
-    newline:      .asciz "\n"           // Nueva línea
+    array:        .word 4, 9, 8, 3, 5   // Declaración del array a ordenar
+    longitud:     .word 5               // Longitud del array
 
 .section .text
-    .global main
+    .global _start
 
-main:
-    // Mostrar el mensaje de inicio
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =prompt                 // Dirección del mensaje de inicio
-    mov x2, #45                     // Longitud del mensaje
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
+_start:
+    ldr x1, =longitud                 // Cargar la dirección de la longitud del array en x1
+    ldr w1, [x1]                      // Cargar el valor de la longitud del array en w1
 
-    // Cargar la longitud del array en w1
-    ldr x1, =length                 // Dirección de la longitud
-    ldr w1, [x1]                    // Cargar la longitud en w1
+inicio_ordenamiento:
+    mov w2, #0                        // Inicializar el índice del bucle externo en 0
 
-selection_sort:
-    // Bucle exterior
-    mov w2, #0                      // Índice inicial del bucle externo
+bucle_externo:
+    cmp w2, w1                         // Comparar el índice del bucle con la longitud del array
+    bge fin_ordenamiento              // Si el índice es igual o mayor a la longitud, terminar el ordenamiento
 
-outer_loop:
-    cmp w2, w1                      // Si el índice es igual a la longitud, terminamos
-    bge end_sort
+    mov w3, w2                        // Suponer que el índice del bucle externo es el mínimo
 
-    // Suponemos que el elemento en w2 es el mínimo
-    mov w3, w2                      // w3 = índice mínimo inicial
+    mov w4, w2                        // Inicializar el índice para la búsqueda del mínimo en el bucle interno
+bucle_interno:
+    add w4, w4, #1                    // Incrementar el índice para buscar el siguiente elemento
 
-    // Bucle interior: buscar el índice del mínimo en la sublista no ordenada
-    mov w4, w2                      // Índice de inicio para la búsqueda
-inner_loop:
-    add w4, w4, #1                  // w4 = índice actual (w2 + 1)
+    cmp w4, w1                        // Si el índice del bucle interno es igual o mayor a la longitud, salir del bucle
+    bge fin_bucle_interno
 
-    cmp w4, w1                      // Si w4 es mayor o igual a la longitud, salimos del bucle interior
-    bge inner_done
+    ldr x5, =array                    // Cargar la dirección base del array en x5
+    lsl w6, w3, #2                    // Calcular el desplazamiento de array[w3] (w3 * 4 bytes)
+    lsl w7, w4, #2                    // Calcular el desplazamiento de array[w4] (w4 * 4 bytes)
+    add x8, x5, x6                    // Dirección de array[w3]
+    add x9, x5, x7                    // Dirección de array[w4]
 
-    // Calcular direcciones de array[w3] y array[w4]
-    ldr x5, =array
-    lsl w6, w3, #2                  // w6 = w3 * 4
-    lsl w7, w4, #2                  // w7 = w4 * 4
-    add x8, x5, x6                  // Dirección de array[w3]
-    add x9, x5, x7                  // Dirección de array[w4]
+    ldr w10, [x8]                     // Cargar el valor de array[w3] en w10
+    ldr w11, [x9]                     // Cargar el valor de array[w4] en w11
 
-    // Cargar los valores de array[w3] y array[w4]
-    ldr w10, [x8]                   // w10 = array[w3]
-    ldr w11, [x9]                   // w11 = array[w4]
+    cmp w11, w10                      // Comparar los valores de array[w4] y array[w3]
+    bge bucle_interno                 // Si array[w4] >= array[w3], continuar buscando
 
-    // Comparar los dos valores
-    cmp w11, w10
-    bge inner_loop                  // Si array[w4] >= array[w3], continuamos buscando
+    mov w3, w4                        // Si array[w4] es menor, actualizar el índice del mínimo a w4
 
-    // Actualizar el índice mínimo a w4
-    mov w3, w4
+    b bucle_interno                   // Repetir el bucle interior
 
-    b inner_loop                    // Repetir el bucle interior
+fin_bucle_interno:
+    cmp w3, w2                         // Comparar el índice mínimo con el índice del bucle externo
+    beq no_intercambiar_externo       // Si son iguales, no es necesario intercambiar
 
-inner_done:
-    // Intercambiar array[w2] con array[w3] si es necesario
-    cmp w3, w2
-    beq no_swap_outer               // Si el mínimo está en la posición correcta, no intercambiar
+    ldr x5, =array                    // Cargar la dirección base del array
+    lsl w6, w2, #2                    // Calcular el desplazamiento de array[w2] (w2 * 4 bytes)
+    lsl w7, w3, #2                    // Calcular el desplazamiento de array[w3] (w3 * 4 bytes)
+    add x8, x5, x6                    // Dirección de array[w2]
+    add x9, x5, x7                    // Dirección de array[w3]
 
-    // Calcular direcciones de array[w2] y array[w3] para el intercambio
-    ldr x5, =array
-    lsl w6, w2, #2                  // w6 = w2 * 4
-    lsl w7, w3, #2                  // w7 = w3 * 4
-    add x8, x5, x6                  // Dirección de array[w2]
-    add x9, x5, x7                  // Dirección de array[w3]
+    ldr w10, [x8]                     // Cargar el valor de array[w2] en w10
+    ldr w11, [x9]                     // Cargar el valor de array[w3] en w11
+    str w11, [x8]                     // Intercambiar los valores: array[w2] = array[w3]
+    str w10, [x9]                     // Intercambiar los valores: array[w3] = array[w2]
 
-    // Intercambiar los valores
-    ldr w10, [x8]                   // w10 = array[w2]
-    ldr w11, [x9]                   // w11 = array[w3]
-    str w11, [x8]                   // array[w2] = array[w3]
-    str w10, [x9]                   // array[w3] = array[w2]
+no_intercambiar_externo:
+    add w2, w2, #1                    // Incrementar el índice del bucle externo
+    b bucle_externo                   // Repetir el bucle externo
 
-no_swap_outer:
-    add w2, w2, #1                  // Incrementar el índice del bucle externo
-    b outer_loop                    // Repetir el bucle externo
+fin_ordenamiento:
+    mov w12, #0                       // Inicializar el índice para imprimir el array ordenado
 
-end_sort:
-    // Mostrar el mensaje de array ordenado
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =sortedMsg              // Dirección del mensaje "Array ordenado:\n"
-    mov x2, #16                     // Longitud del mensaje
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
+imprimir_array:
+    ldr x3, =array                    // Cargar la dirección base del array
+    lsl w13, w12, #2                  // Calcular el desplazamiento de array[w12] (w12 * 4 bytes)
+    add x3, x3, x13                   // Dirección de array[w12]
+    ldr w0, [x3]                      // Cargar el valor de array[w12] en w0
 
-    // Imprimir los elementos del array ordenado
-    mov w12, #0                     // Inicializar índice en 0
+    bl imprimir_num                   // Llamar a la función para imprimir el número
 
-print_array:
-    ldr x3, =array                  // Dirección base del array
-    lsl w13, w12, #2                // Desplazamiento de w12 (w13 = w12 * 4 bytes por palabra)
-    add x3, x3, x13                 // Dirección de array[w12]
-    ldr w0, [x3]                    // Cargar el valor en w0
+    add w12, w12, #1                  // Incrementar el índice para imprimir el siguiente elemento
+    ldr x1, =longitud                 // Cargar la dirección de la longitud del array
+    ldr w1, [x1]                      // Cargar la longitud del array
+    cmp w12, w1                       // Comparar el índice con la longitud
+    blt imprimir_array                // Repetir si aún hay elementos por imprimir
 
-    // Convertir el número a texto (para impresión) llamando a la función print_num
-    bl print_num
+    mov x8, #93                       // Syscall para salir del programa (exit)
+    svc #0                            // Ejecutar la syscall para salir
 
-    // Imprimir una nueva línea
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =newline                // Dirección de la nueva línea
-    mov x2, #1                      // Longitud de la nueva línea
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
+    add w0, w0, '0'                   // Convertir el número a su representación ASCII
+    mov x1, sp                        // Usar la pila como buffer temporal
+    strb w0, [x1, #-1]!               // Guardar el carácter en la pila
 
-    add w12, w12, #1                // Incrementar índice
-    ldr x1, =length                 // Dirección de la longitud
-    ldr w1, [x1]                    // Leer la longitud original del array
-    cmp w12, w1                     // Comparar índice con la longitud del array
-    blt print_array                 // Repetir si aún hay elementos
+    mov x0, #1                        // Descriptor de archivo para STDOUT
+    mov x2, #1                        // Longitud del número convertido
+    mov x8, #64                       // Syscall para escribir en consola (write)
+    svc #0                            // Ejecutar la syscall para escribir en consola
 
-    // Terminar el programa
-    mov x8, #93                     // Syscall para 'exit' (93)
-    svc #0                          // Ejecutar syscall
-
-// Función print_num: convierte un número en w0 a una cadena y lo imprime
-print_num:
-    // Aquí puedes implementar un procedimiento simple para convertir el número en w0 a ASCII.
-    // Por simplicidad, asume que w0 contiene un solo dígito para este ejemplo.
-
-    add w0, w0, '0'                 // Convertir el número a su equivalente ASCII
-    mov x1, sp                      // Usar la pila para el buffer temporal
-    strb w0, [x1, #-1]!             // Guardar el carácter en la pila
-
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    mov x2, #1                      // Longitud del número convertido
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
-
-    ret                             // Retornar de la función
-
-	
+    ret                               // Retornar de la función
