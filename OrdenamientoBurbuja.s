@@ -8,12 +8,38 @@
 *              
 *              
 * Compilación:  as -o OrdenamientoBurbuja.o OrdenamientoBurbuja.s
-*               gcc -o OrdenamientoBurbuja OrdenamientoBurbuja.o
+*               ld -o OrdenamientoBurbuja OrdenamientoBurbuja.o
 * Ejecución:    ./OrdenamientoBurbuja
 *
 * Código equivalente en C#:
 * -----------------------------------------------------
+*  static void Main()
+*  {
+*        int[] numeros = { 5, 3, 8, 1, 2 };
+*        int n = numeros.Length;
 *
+*        Console.WriteLine("Arreglo ordenado:");
+*
+*        for (int i = 0; i < n - 1; i++)
+*        {
+*            for (int j = 0; j < n - i - 1; j++)
+*            {
+*                if (numeros[j] > numeros[j + 1])
+*                {
+*                    int temp = numeros[j];
+*                    numeros[j] = numeros[j + 1];
+*                    numeros[j + 1] = temp;
+*                }
+*            }
+*        }
+*
+*        foreach (var numero in numeros)
+*        {
+*            Console.Write(numero + " ");
+*        }
+*
+*        Console.WriteLine();
+*    }
 *
 * ASCIINEMA
 * -----------------------------------------------------
@@ -22,119 +48,98 @@
 
 =========================================================*/
 
-/ Programa en ARM64 Assembly para ordenar un array de enteros con el método burbuja
-// Este programa imprimirá el array ordenado después de realizar el ordenamiento
 
-.sectio  .data
-    prompt:       .asciz "Ordenando el array usando el método burbuja...\n"
-    sortedMsg:    .asciz "Array ordenado:\n"
-    array:        .word 5, 3, 8, 1, 2   // Array a ordenar
-    length:       .word 5               // Longitud del array
-    newline:      .asciz "\n"           // Nueva línea
+.section  .data
+
+    msg_ordenado:    .asciz "Arreglo ordenado:\n"   // Mensaje que se mostrará antes de imprimir el array ordenado
+    numeros:         .word 5, 3, 8, 1, 2            // Array a ordenar
+    T:               .word 5                        // Longitud del array
 
 .section .text
-    .global main
+    .global _start
 
-main:
-    // Mostrar el mensaje de inicio
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =prompt                 // Dirección del mensaje de inicio
-    mov x2, #43                     // Longitud del mensaje
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
+_start:
 
     // Cargar la longitud del array en w1
-    ldr x1, =length                 // Dirección de la longitud
-    ldr w1, [x1]                    // Cargar la longitud en w1
+    ldr x1, =T                // Dirección de la longitud del array
+    ldr w1, [x1]              // Cargar la longitud en el registro w1
 
-bubble_sort_outer:
-    sub w2, w1, #1                  // w2 = length - 1 (número de pasadas)
-
-    cmp w2, #0                      // Si w2 llega a 0, hemos terminado
-    ble end_sort                    // Salir si w2 es 0 o negativo
+ordenar_burbuja_externo:
+    sub w2, w1, #1            // w2 = length - 1 (número de pasadas)
+    cmp w2, #0                // Si w2 es 0, hemos terminado
+    ble fin_ordenamiento      // Salir si w2 es 0 o negativo
 
     // Establecer el contador para el bucle interno
-    mov w3, #0                      // Índice inicial del bucle interno
+    mov w3, #0                // Índice inicial del bucle interno
 
-bubble_sort_inner:
-    ldr x4, =array                  // Dirección base del array
+ordenar_burbuja_interno:
+    ldr x4, =numeros          // Dirección base del array
 
     // Calcular la dirección de los elementos a comparar
-    lsl w5, w3, #2                  // Desplazar w3 para obtener la posición en bytes
-    add x6, x4, x5                  // Dirección de array[w3]
-    add x7, x6, #4                  // Dirección de array[w3 + 1]
+    lsl w5, w3, #2            // Desplazar w3 para obtener la posición en bytes
+    add x6, x4, x5            // Dirección de array[w3]
+    add x7, x6, #4            // Dirección de array[w3 + 1]
 
     // Cargar los valores a comparar
-    ldr w8, [x6]                    // Valor en array[w3]
-    ldr w9, [x7]                    // Valor en array[w3 + 1]
+    ldr w8, [x6]              // Valor en array[w3]
+    ldr w9, [x7]              // Valor en array[w3 + 1]
 
     // Comparar los dos valores
     cmp w8, w9
-    ble no_swap                     // Si array[w3] <= array[w3 + 1], no intercambiar
+    ble sin_intercambio       // Si array[w3] <= array[w3 + 1], no intercambiar
 
     // Intercambiar los valores
-    str w9, [x6]
-    str w8, [x7]
+    str w9, [x6]              // Guardar w9 (valor de array[w3 + 1]) en array[w3]
+    str w8, [x7]              // Guardar w8 (valor de array[w3]) en array[w3 + 1]
 
-no_swap:
-    add w3, w3, #1                  // Incrementar índice interno
-    cmp w3, w2                      // Verificar si llegamos al final de la pasada
-    blt bubble_sort_inner           // Si no, repetir el bucle interno
+sin_intercambio:
+    add w3, w3, #1            // Incrementar índice interno
+    cmp w3, w2                // Verificar si llegamos al final de la pasada
+    blt ordenar_burbuja_interno // Si no, repetir el bucle interno
 
-    sub w1, w1, #1                  // Decrementar el contador externo (número de pasadas)
-    b bubble_sort_outer             // Repetir el bucle externo
+    sub w1, w1, #1            // Decrementar el contador externo (número de pasadas)
+    b ordenar_burbuja_externo // Repetir el bucle externo
 
-end_sort:
+fin_ordenamiento:
     // Mostrar el mensaje de array ordenado
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =sortedMsg              // Dirección del mensaje "Array ordenado:\n"
-    mov x2, #16                     // Longitud del mensaje
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
+    mov x0, #1                // Descriptor de archivo para STDOUT
+    ldr x1, =msg_ordenado      // Dirección del mensaje "Array ordenado:\n"
+    mov x2, #16               // Longitud del mensaje
+    mov x8, #64               // Syscall para 'write' (64)
+    svc #0                    // Ejecutar syscall
 
     // Imprimir los elementos del array ordenado
-    mov w10, #0                     // Inicializar índice en 0
+    mov w10, #0               // Inicializar índice en 0
 
-print_array:
-    ldr x3, =array                  // Dirección base del array
-    lsl w11, w10, #2                // Desplazamiento de w10 (w11 = w10 * 4 bytes por palabra)
-    add x3, x3, x11                 // Dirección de array[w10]
-    ldr w0, [x3]                    // Cargar el valor en w0
+imprimir_array:
+    ldr x3, =numeros          // Dirección base del array
+    lsl w11, w10, #2          // Desplazamiento de w10 (w11 = w10 * 4 bytes por palabra)
+    add x3, x3, x11           // Dirección de array[w10]
+    ldr w0, [x3]              // Cargar el valor en w0
 
     // Convertir el número a texto (para impresión) llamando a la función print_num
-    bl print_num
+    bl imprimir_numero
 
-    // Imprimir una nueva línea
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    ldr x1, =newline                // Dirección de la nueva línea
-    mov x2, #1                      // Longitud de la nueva línea
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
-
-    add w10, w10, #1                // Incrementar índice
-    ldr x1, =length                 // Dirección de la longitud
-    ldr w1, [x1]                    // Leer la longitud original del array
-    cmp w10, w1                     // Comparar índice con la longitud del array
-    blt print_array                 // Repetir si aún hay elementos
+    add w10, w10, #1          // Incrementar índice
+    ldr x1, =T                 // Dirección de la longitud
+    ldr w1, [x1]              // Leer la longitud original del array
+    cmp w10, w1               // Comparar índice con la longitud del array
+    blt imprimir_array        // Repetir si aún hay elementos
 
     // Terminar el programa
-    mov x8, #93                     // Syscall para 'exit' (93)
-    svc #0                          // Ejecutar syscall
+    mov x8, #93               // Syscall para 'exit' (93)
+    svc #0                    // Ejecutar syscall
 
-// Función print_num: convierte un número en w0 a una cadena y lo imprime
-print_num:
-    // Aquí puedes implementar un procedimiento simple para convertir el número en w0 a ASCII.
-    // Por simplicidad, asume que w0 contiene un solo dígito para este ejemplo.
 
-    add w0, w0, '0'                 // Convertir el número a su equivalente ASCII
-    mov x1, sp                      // Usar la pila para el buffer temporal
-    strb w0, [x1, #-1]!             // Guardar el carácter en la pila
+imprimir_numero:
+    // Convertir el número a su equivalente ASCII
+    add w0, w0, '0'           // Convertir el número a su equivalente ASCII
+    mov x1, sp                // Usar la pila para el buffer temporal
+    strb w0, [x1, #-1]!       // Guardar el carácter en la pila
 
-    mov x0, #1                      // Descriptor de archivo para STDOUT
-    mov x2, #1                      // Longitud del número convertido
-    mov x8, #64                     // Syscall para 'write' (64)
-    svc #0                          // Ejecutar syscall
-
-    ret                             // Retornar de la función
+    mov x0, #1                // Descriptor de archivo para STDOUT
+    mov x2, #1                // Longitud del número convertido
+    mov x8, #64               // Syscall para 'write' (64)
+    svc #0                    // Ejecutar syscall
 
 	
