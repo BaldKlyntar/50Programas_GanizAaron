@@ -13,18 +13,54 @@
 *
 * Código equivalente en C#:
 * -----------------------------------------------------
-*            Console.WriteLine("Ingrese el primer valor");
-*            float x = float.Parse(Console.ReadLine());
-*
-*            Console.WriteLine("Ingrese el segundo valor");
-*            float y = float.Parse(Console.ReadLine());
-*            float resta = x - y;
-*            Console.WriteLine("La suma es: {0}", resta);
-*
+* static void Main()
+*   {
+*        char inputChar = 'A';
+*        int asciiValue = 0;
+*        
+*        asciiValue = inputChar - '0';
+*        if (inputChar >= 'A' && inputChar <= 'Z')
+*        {
+*            asciiValue = inputChar - 'A' + 65;
+*        }
+*        else if (inputChar >= 'a' && inputChar <= 'z')
+*        {
+*            asciiValue = inputChar - 'a' + 97;
+*        }
+*        
+*        Console.WriteLine("El valor ASCII de '{0}' es: {1}", inputChar, asciiValue);
+*    }
 *
 * ASCIINEMA
 * -----------------------------------------------------
-* https://asciinema.org/a/JqirVW0Vy6vL8KDMk80bPEwev
+* https://asciinema.org/a/ET2LMkembbDCcoQl5opH5fVXz
 * -----------------------------------------------------
 
 =========================================================*/
+
+
+.section .data
+    char_input: .asciz "A"  // Carácter de entrada
+    msg_output: .asciz "La conversión ASCII a entero es: %d\n"  // Mensaje para imprimir
+
+.section .text
+    .global main
+    .extern printf
+
+main:
+    // Cargar la dirección del carácter en x0
+    ldr x0, =char_input      // Cargar la dirección de "A" en x0
+    ldrb w1, [x0]            // Cargar el valor del carácter ASCII en w1 (usamos ldrb porque es un byte)
+
+    // Cargar la dirección del mensaje en x0 y el valor ASCII en x1
+    ldr x0, =msg_output      // Cargar la dirección del mensaje
+    bl printf                // Llamar a printf
+
+    // Salir del programa
+    mov x0, #0               // Código de estado 0 (indica éxito)
+    mov x8, #93              // Número de syscall para 'exit' (93 en ARM64)
+    svc #0                   // Ejecutar syscall
+
+  
+
+
