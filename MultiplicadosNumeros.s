@@ -18,13 +18,13 @@
 *
 *            Console.WriteLine("Ingrese el segundo valor");
 *            float y = float.Parse(Console.ReadLine());
-*            float resta = x * y;
-*            Console.WriteLine("La multiplicacion es: {0}", resta);
+*            float multiplicacion = x * y;
+*            Console.WriteLine("La multiplicacion es: {0}", multiplicacion);
 *
 *
 * ASCIINEMA
 * -----------------------------------------------------
-* 
+* https://asciinema.org/a/JWsY8IE2mwnu3K5uzndvgnrCj
 * -----------------------------------------------------
 
 =========================================================*/
