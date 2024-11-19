@@ -1,3 +1,29 @@
+
+/*=======================================================
+* Programa:       NumeroArmstrong.s
+* Autor:        Ganiz Galaz Aaron
+* No.Control:   23211003
+* Fecha:        06 de Noviembre de 2024
+*Descripción: Programa que identifica si
+*             un valor es armstrong
+*              
+*              
+* Compilación:  as -o NumeroArmstrong.o NumerosAleatorios.s
+*               gcc -o NumeroArmstrong NumerosAleatorios.o
+* Ejecución:    ./NumeroArmstrong
+*
+* Código equivalente en C#:
+* -----------------------------------------------------
+*
+*
+* ASCIINEMA
+* -----------------------------------------------------
+* https://asciinema.org/a/R2SbR6Ezm7fmJNAWQSYhqi5CH
+* -----------------------------------------------------
+
+=========================================================*/
+
+
 .section .data
 prompt:  .ascii "Ingrese un número: "
 yes_msg: .ascii "Es un número de Armstrong\n"
