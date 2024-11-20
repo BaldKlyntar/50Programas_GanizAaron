@@ -3,9 +3,9 @@
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
 * Fecha:        06 de Noviembre de 2024
-* Descripción: Programa que resta
-*              dos numeros ingresados por
-*              el usuario.
+* Descripción: Programa que convierte un valor
+*            de binario a decimal
+*              
 *              
 * Compilación:  as -o BinarioDecimal.o BinarioDecimal.s
 *               gcc -o BinarioDecimal BinarioDecimal.o
