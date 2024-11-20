@@ -3,9 +3,9 @@
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
 * Fecha:        06 de Noviembre de 2024
-* Descripción: Programa que resta
-*              dos numeros ingresados por
-*              el usuario.
+* Descripción: Programa que utiliza las operaciones
+*              logicas AND, OR y XOR
+*             
 *              
 * Compilación:  as -o OperacionesLogicas.o OperacionesLogicas.s
 *               gcc -o OperacionesLogicas OperacionesLogicas.o
