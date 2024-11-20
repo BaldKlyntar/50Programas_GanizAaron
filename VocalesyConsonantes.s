@@ -3,9 +3,9 @@
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
 * Fecha:        06 de Noviembre de 2024
-* Descripción: Programa que resta
-*              dos numeros ingresados por
-*              el usuario.
+* Descripción: Programa que cuenta las vocales
+*              y consonantes de una cadena
+*              
 *              
 * Compilación:  as -o VocalesyConsonantes.o VocalesyConsonantes.s
 *               gcc -o VocalesyConsonantes VocalesyConsonantes.o
