@@ -3,9 +3,9 @@
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
 * Fecha:        06 de Noviembre de 2024
-* Descripción: Programa que resta
-*              dos numeros ingresados por
-*              el usuario.
+* Descripción: Programa que genera numeros aleatorios
+*              por medio de una semilla
+*              
 *              
 * Compilación:  as -o NumerosAleatorios.o NumerosAleatorios.s
 *               gcc -o NumerosAleatorios NumerosAleatorios.o
