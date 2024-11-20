@@ -3,9 +3,9 @@
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
 * Fecha:        06 de Noviembre de 2024
-* Descripción: Programa que resta
-*              dos numeros ingresados por
-*              el usuario.
+* Descripción: Programa que suma los valores
+*              de un arreglo
+*              
 *              
 * Compilación:  as -o SumaArreglo.o SumaArreglo.s
 *               gcc -o SumaArreglo SumaArreglo.o
