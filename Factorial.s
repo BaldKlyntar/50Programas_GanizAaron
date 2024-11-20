@@ -3,9 +3,9 @@
 * Autor:        Ganiz Galaz Aaron
 * No.Control:   23211003
 * Fecha:        09 de Noviembre de 2024
-* Descripción: Programa que divide
-*              dos numeros ingresados por
-*              el usuario.
+* Descripción: Programa que calcula el factorial
+*              de un numero
+*              
 *              
 * Compilación:  as -o Factorial.o Factorial.s
 *               gcc -o Factorial Factorial.o
